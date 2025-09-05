@@ -3,15 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Form Fakultas dan Program Studi - Modular</title>
-    <link rel="stylesheet" href="styles.css">
+    <title>Form Fakultas dan Program Studi</title>
 </head>
 <body>
-    <div class="form-container">
-        <h1>Form Pendaftaran Mahasiswa</h1>
+    <div>
+        <h1>Form Mahasiswa</h1>
         
-        <form id="form_mahasiswa">
-            <div class="form-group">
+        <form id="form_mahasiswa">   
+            <div>
                 <label for="fakultas">Fakultas:</label>
                 <select name="fakultas" id="fakultas" required>
                     <option value="">---Pilih Fakultas---</option>
@@ -20,23 +19,68 @@
                     <option value="FE">Fakultas Ekonomi</option>
                 </select>
             </div>
+            <br>
             
-            <div class="form-group">
+            <div>
                 <label for="prodi">Program Studi:</label>
                 <select name="prodi" id="prodi" disabled required>
                     <option value="">---Pilih Program Studi---</option>
                 </select>
             </div>
+            <br>
             
-            <div class="button-group">
-                <button type="submit" class="submit-btn">Submit</button>
-                <button type="button" class="reset-btn" onclick="resetForm()">Reset</button>
+            <div>
+                <button type="submit">Submit</button>
+                <button type="button" onclick="resetForm()">Reset</button>
             </div>
         </form>
         
-        <div id="result" class="result"></div>
+        <div id="result"></div>
     </div>
 
-    <script src="script.js"></script>
+    <script>
+        const fakultasSelect = document.getElementById('fakultas');
+        const prodiSelect = document.getElementById('prodi');
+        const prodiOptions = {
+            FSM : ['Informatics', 'Mathematics'],
+            FT : ['Civil Engineering', 'Architecture Engineering'],
+            FE : ['Economics', 'Accounting']
+        };
+
+        fakultasSelect.addEventListener('change', function() {
+            const selectedFakultas = this.value;
+            prodiSelect.innerHTML = '<option value="">---Pilih Program Studi---</option>';
+            prodiSelect.disabled = !selectedFakultas;
+
+            if (selectedFakultas) {
+                prodiOptions[selectedFakultas].forEach(prodi => {
+                    const option = document.createElement('option');
+                    option.value = prodi;
+                    option.text = prodi;
+                    prodiSelect.appendChild(option);
+                });
+            }
+        });
+
+        document.getElementById('form_mahasiswa').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const fakultas = fakultasSelect.value;
+            const prodi = prodiSelect.value;
+            
+            if (fakultas && prodi) {
+                document.getElementById('result').innerHTML = 
+                    '<h3>Data yang dipilih:</h3>' +
+                    '<p>Fakultas: ' + fakultasSelect.options[fakultasSelect.selectedIndex].text + '</p>' +
+                    '<p>Program Studi: ' + prodi + '</p>';
+            }
+        });
+
+        function resetForm() {
+            document.getElementById('form_mahasiswa').reset();
+            prodiSelect.disabled = true;
+            prodiSelect.innerHTML = '<option value="">---Pilih Program Studi---</option>';
+            document.getElementById('result').innerHTML = '';
+        }
+    </script>
 </body>
 </html>
