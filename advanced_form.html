@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced Dropdown Form</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        .main-container {
+            margin-top: 50px;
+            margin-bottom: 50px;
+        }
+        
+        .card {
+            border: none;
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+        }
+        
+        .card-header {
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            color: white;
+            border-radius: 20px 20px 0 0 !important;
+            padding: 25px;
+        }
+        
+        .form-control:focus, .form-select:focus {
+            border-color: #3498db;
+            box-shadow: 0 0 0 0.2rem rgba(52, 152, 219, 0.25);
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            border: none;
+            border-radius: 10px;
+            padding: 12px 30px;
+            font-weight: 600;
+        }
+        
+        .btn-secondary {
+            background: linear-gradient(135deg, #95a5a6, #7f8c8d);
+            border: none;
+            border-radius: 10px;
+            padding: 12px 30px;
+            font-weight: 600;
+        }
+        
+        .result-card {
+            background: linear-gradient(135deg, #2ecc71, #27ae60);
+            color: white;
+            border-radius: 15px;
+            margin-top: 20px;
+        }
+        
+        .loading-spinner {
+            display: none;
+        }
+        
+        .form-floating > label {
+            color: #6c757d;
+        }
+        
+        .animate-fade-in {
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container main-container">
+        <div class="row justify-content-center">
+            <div class="col-md-8 col-lg-6">
+                <div class="card">
+                    <div class="card-header text-center">
+                        <h2 class="mb-0">
+                            <i class="fas fa-graduation-cap me-2"></i>
+                            Form Pendaftaran Mahasiswa
+                        </h2>
+                        <p class="mb-0 mt-2">Silakan pilih fakultas dan program studi Anda</p>
+                    </div>
+                    
+                    <div class="card-body p-4">
+                        <form id="registrationForm">
+                            <!-- Fakultas Selection -->
+                            <div class="form-floating mb-4">
+                                <select class="form-select" id="fakultas" name="fakultas" required>
+                                    <option value="">Pilih Fakultas</option>
+                                    <option value="FSM">Fakultas Sains dan Matematika</option>
+                                    <option value="FT">Fakultas Teknik</option>
+                                    <option value="FE">Fakultas Ekonomi</option>
+                                </select>
+                                <label for="fakultas">
+                                    <i class="fas fa-university me-2"></i>Fakultas
+                                </label>
+                            </div>
+                            
+                            <!-- Program Studi Selection -->
+                            <div class="form-floating mb-4">
+                                <select class="form-select" id="prodi" name="prodi" disabled required>
+                                    <option value="">Pilih Program Studi</option>
+                                </select>
+                                <label for="prodi">
+                                    <i class="fas fa-book me-2"></i>Program Studi
+                                </label>
+                                <div class="loading-spinner mt-2">
+                                    <div class="spinner-border spinner-border-sm text-primary" role="status">
+                                        <span class="visually-hidden">Loading...</span>
+                                    </div>
+                                    <small class="ms-2 text-muted">Memuat program studi...</small>
+                                </div>
+                            </div>
+                            
+                            <!-- Additional Info -->
+                            <div class="form-floating mb-4">
+                                <input type="text" class="form-control" id="nama" name="nama" placeholder="Nama Lengkap">
+                                <label for="nama">
+                                    <i class="fas fa-user me-2"></i>Nama Lengkap (Opsional)
+                                </label>
+                            </div>
+                            
+                            <!-- Buttons -->
+                            <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                                <button type="button" class="btn btn-secondary me-md-2" id="resetBtn">
+                                    <i class="fas fa-undo me-2"></i>Reset
+                                </button>
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-paper-plane me-2"></i>Submit
+                                </button>
+                            </div>
+                        </form>
+                        
+                        <!-- Result Display -->
+                        <div id="resultContainer" style="display: none;">
+                            <div class="card result-card">
+                                <div class="card-body">
+                                    <h5 class="card-title">
+                                        <i class="fas fa-check-circle me-2"></i>
+                                        Data Berhasil Disimpan
+                                    </h5>
+                                    <div id="resultContent"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Info Cards -->
+                <div class="row mt-4">
+                    <div class="col-md-4 mb-3">
+                        <div class="card text-center h-100">
+                            <div class="card-body">
+                                <i class="fas fa-flask fa-2x text-primary mb-3"></i>
+                                <h6>FSM</h6>
+                                <small class="text-muted">Fakultas Sains dan Matematika</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <div class="card text-center h-100">
+                            <div class="card-body">
+                                <i class="fas fa-cogs fa-2x text-warning mb-3"></i>
+                                <h6>FT</h6>
+                                <small class="text-muted">Fakultas Teknik</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <div class="card text-center h-100">
+                            <div class="card-body">
+                                <i class="fas fa-chart-line fa-2x text-success mb-3"></i>
+                                <h6>FE</h6>
+                                <small class="text-muted">Fakultas Ekonomi</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Data program studi dengan informasi tambahan
+        const programStudiData = {
+            'FSM': [
+                { value: 'informatika', text: 'Informatika', description: 'Teknologi Informasi dan Komputer' },
+                { value: 'matematika', text: 'Matematika', description: 'Ilmu Matematika Murni dan Terapan' },
+                { value: 'fisika', text: 'Fisika', description: 'Ilmu Fisika dan Aplikasinya' },
+                { value: 'kimia', text: 'Kimia', description: 'Ilmu Kimia dan Teknologi Kimia' },
+                { value: 'biologi', text: 'Biologi', description: 'Ilmu Hayat dan Bioteknologi' }
+            ],
+            'FT': [
+                { value: 'sipil', text: 'Teknik Sipil', description: 'Konstruksi dan Infrastruktur' },
+                { value: 'arsitektur', text: 'Arsitektur', description: 'Desain Bangunan dan Tata Ruang' },
+                { value: 'elektro', text: 'Teknik Elektro', description: 'Teknologi Elektronika dan Listrik' },
+                { value: 'mesin', text: 'Teknik Mesin', description: 'Permesinan dan Manufaktur' },
+                { value: 'industri', text: 'Teknik Industri', description: 'Optimasi Sistem dan Proses' }
+            ],
+            'FE': [
+                { value: 'manajemen', text: 'Manajemen', description: 'Pengelolaan Bisnis dan Organisasi' },
+                { value: 'akuntansi', text: 'Akuntansi', description: 'Sistem Informasi Keuangan' },
+                { value: 'ekonomi_pembangunan', text: 'Ekonomi Pembangunan', description: 'Ekonomi Makro dan Pembangunan' },
+                { value: 'ekonomi_islam', text: 'Ekonomi Islam', description: 'Ekonomi Syariah dan Keuangan Islam' }
+            ]
+        };
+
+        class AdvancedDropdownForm {
+            constructor() {
+                this.fakultasSelect = document.getElementById('fakultas');
+                this.prodiSelect = document.getElementById('prodi');
+                this.namaInput = document.getElementById('nama');
+                this.form = document.getElementById('registrationForm');
+                this.resultContainer = document.getElementById('resultContainer');
+                this.resultContent = document.getElementById('resultContent');
+                this.resetBtn = document.getElementById('resetBtn');
+                this.loadingSpinner = document.querySelector('.loading-spinner');
+                
+                this.init();
+            }
+            
+            init() {
+                this.setupEventListeners();
+                this.resetForm();
+            }
+            
+            setupEventListeners() {
+                this.fakultasSelect.addEventListener('change', (e) => {
+                    this.handleFakultasChange(e.target.value);
+                });
+                
+                this.form.addEventListener('submit', (e) => {
+                    this.handleFormSubmit(e);
+                });
+                
+                this.resetBtn.addEventListener('click', () => {
+                    this.resetForm();
+                });
+            }
+            
+            async handleFakultasChange(selectedFakultas) {
+                this.resetProdiDropdown();
+                this.hideResult();
+                
+                if (selectedFakultas === '') {
+                    this.prodiSelect.disabled = true;
+                    return;
+                }
+                
+                // Show loading
+                this.showLoading();
+                
+                // Simulate API call delay
+                await this.delay(800);
+                
+                this.prodiSelect.disabled = false;
+                this.populateProdiOptions(selectedFakultas);
+                this.hideLoading();
+            }
+            
+            showLoading() {
+                this.loadingSpinner.style.display = 'block';
+                this.prodiSelect.disabled = true;
+            }
+            
+            hideLoading() {
+                this.loadingSpinner.style.display = 'none';
+            }
+            
+            delay(ms) {
+                return new Promise(resolve => setTimeout(resolve, ms));
+            }
+            
+            resetProdiDropdown() {
+                this.prodiSelect.innerHTML = '<option value="">Pilih Program Studi</option>';
+            }
+            
+            populateProdiOptions(fakultasCode) {
+                const prodiOptions = programStudiData[fakultasCode];
+                
+                if (prodiOptions) {
+                    prodiOptions.forEach(prodi => {
+                        const option = document.createElement('option');
+                        option.value = prodi.value;
+                        option.textContent = prodi.text;
+                        option.setAttribute('data-description', prodi.description);
+                        this.prodiSelect.appendChild(option);
+                    });
+                }
+            }
+            
+            handleFormSubmit(e) {
+                e.preventDefault();
+                
+                const formData = new FormData(this.form);
+                const data = Object.fromEntries(formData);
+                
+                if (!data.fakultas || !data.prodi) {
+                    this.showAlert('Mohon pilih fakultas dan program studi terlebih dahulu!', 'warning');
+                    return;
+                }
+                
+                this.showResult(data);
+            }
+            
+            showResult(data) {
+                const fakultasText = this.fakultasSelect.options[this.fakultasSelect.selectedIndex].text;
+                const prodiText = this.prodiSelect.options[this.prodiSelect.selectedIndex].text;
+                const prodiDescription = this.prodiSelect.options[this.prodiSelect.selectedIndex].getAttribute('data-description');
+                
+                this.resultContent.innerHTML = `
+                    <div class="row">
+                        <div class="col-md-6">
+                            <strong><i class="fas fa-university me-2"></i>Fakultas:</strong><br>
+                            <span class="ms-3">${fakultasText}</span>
+                        </div>
+                        <div class="col-md-6">
+                            <strong><i class="fas fa-book me-2"></i>Program Studi:</strong><br>
+                            <span class="ms-3">${prodiText}</span>
+                            ${prodiDescription ? `<br><small class="ms-3 opacity-75">${prodiDescription}</small>` : ''}
+                        </div>
+                        ${data.nama ? `
+                        <div class="col-12 mt-3">
+                            <strong><i class="fas fa-user me-2"></i>Nama:</strong><br>
+                            <span class="ms-3">${data.nama}</span>
+                        </div>
+                        ` : ''}
+                        <div class="col-12 mt-3">
+                            <strong><i class="fas fa-clock me-2"></i>Waktu Pendaftaran:</strong><br>
+                            <span class="ms-3">${new Date().toLocaleString('id-ID')}</span>
+                        </div>
+                    </div>
+                `;
+                
+                this.resultContainer.style.display = 'block';
+                this.resultContainer.classList.add('animate-fade-in');
+                
+                // Scroll to result
+                this.resultContainer.scrollIntoView({ behavior: 'smooth' });
+            }
+            
+            showAlert(message, type = 'info') {
+                // Create toast notification
+                const toast = document.createElement('div');
+                toast.className = `alert alert-${type} alert-dismissible fade show position-fixed`;
+                toast.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 300px;';
+                toast.innerHTML = `
+                    ${message}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                `;
+                
+                document.body.appendChild(toast);
+                
+                // Auto remove after 5 seconds
+                setTimeout(() => {
+                    if (toast.parentNode) {
+                        toast.parentNode.removeChild(toast);
+                    }
+                }, 5000);
+            }
+            
+            hideResult() {
+                this.resultContainer.style.display = 'none';
+                this.resultContainer.classList.remove('animate-fade-in');
+            }
+            
+            resetForm() {
+                this.form.reset();
+                this.resetProdiDropdown();
+                this.prodiSelect.disabled = true;
+                this.hideResult();
+                this.hideLoading();
+            }
+        }
+
+        // Initialize when DOM is loaded
+        document.addEventListener('DOMContentLoaded', function() {
+            new AdvancedDropdownForm();
+        });
+    </script>
+</body>
+</html>
